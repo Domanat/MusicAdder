@@ -8,14 +8,14 @@ password = credentialsFile.read(9)
 client = Client.from_credentials(email, password)
 
 playlists = client.users_playlists_list()
-	doomerId = 0
+doomerId = 0
 	
-	for i in playlists:
-		if i.title == "Doomer Music":
-			doomerId = i.kind
-			break
+for i in playlists:
+	if i.title == "Doomer Music":
+		doomerId = i.kind
+		break
 
-	print("Playlist ID:", doomerId)
+print("Playlist ID:", doomerId)
 
 def findTracksOfArtist(artistName):
 

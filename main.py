@@ -36,16 +36,17 @@ def findTracksOfArtist(artistName):
 
 	for i in range(search.tracks.total):
 		track = search.tracks.results[i]
-		print("Track title: ", track.title)
+		#print("Track title: ", track.title)
 		for j in range(len(track.artists)):
 			artist = track.artists
-			if artist == artistName:
+			if artist[j]['name'] == artistName:
 				print("Right tracks")
+				print("Track title", track.title)
 				rightTrack = True
 				break
 
 		if rightTrack:
-			print("Add to playlist track: ", search.tracks[i].title)
+			#print("Add to playlist track: ", track.title)
 			rightTrack = False
 
 	'''for track in search.tracks.results:

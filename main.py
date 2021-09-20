@@ -1,14 +1,10 @@
 from yandex_music import Client
 import math
 
-#email@yandex.ruPassword
-credentialsFile = open("credentials.txt", "r")
+tokenFile = open("token.txt", "r")
 
-email = credentialsFile.read(23)
-password = credentialsFile.read(9)
-
-#client = Client()
-client = Client.from_credentials(email, password)
+token = tokenFile.readline()
+client = Client(token, report_new_fields=False)
 
 def isTrackInPlaylist(playlistId, trackName):
     playlist = client.users_playlists(playlistId)
@@ -21,11 +17,11 @@ def isTrackInPlaylist(playlistId, trackName):
 
     return False
 
-def addTracksByArtist(artistName):
+def addTracksByArtist(artistName, playlistName):
 
     listOfPlaylists = client.users_playlists_list()
     for playlist in listOfPlaylists:
-        if playlist.title == "Doomer Music":
+        if playlist.title == playlistName:
             revision = playlist.revision
             doomerId = playlist.kind
 
@@ -70,5 +66,5 @@ if __name__ == '__main__':
     while True:
         query = input('Enter artist name: ')
         if query == "!quit":
-            break;
-        addTracksByArtist(query)
+                break;
+        addTracksByArtist(query, "Doomer Music")

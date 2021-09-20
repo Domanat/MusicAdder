@@ -1,4 +1,5 @@
 from yandex_music import Client
+import math
 
 #email@yandex.ruPassword
 credentialsFile = open("credentials.txt", "r")
@@ -6,70 +7,57 @@ credentialsFile = open("credentials.txt", "r")
 email = credentialsFile.read(23)
 password = credentialsFile.read(9)
 
-client = Client()
+#client = Client()
+client = Client.from_credentials(email, password)
 
-'''client = Client.from_credentials(email, password)
 
-playlists = client.users_playlists_list()
-doomerId = 0
-	
-for i in playlists:
-	if i.title == "Doomer Music":
-		doomerId = i.kind
-		break
+def addTracksByArtist(artistName):
 
-print("Playlist ID:", doomerId)'''
+    listOfPlaylists = client.users_playlists_list()
+    for playlist in listOfPlaylists:
+        if playlist.title == "Doomer Music":
+            revision = playlist.revision
+            doomerId = playlist.kind
 
-def findTracksOfArtist(artistName):
+    counter = 0
+    search = client.search(artistName, type_="Track")
 
-	#type Search
-	search = client.search(artistName)
+    if search.tracks == None:
+        print("No such artist\nTry again")
+        return
 
-	if search.tracks == None:
-		print("No tracks")
-		return
+    numberOfPages = math.ceil(search.tracks.total/search.tracks.per_page)
+    for i in range(numberOfPages):
 
-	rightTrack = False
-	print("Number of tracks", search.tracks.total)
+        search = client.search(artistName, type_="Track", page=i)
+        if search.tracks == None:
+            print("No tracks on page", i)
+            return
 
-	print(type(search.tracks.results[0]))
+        isRightTrack = False
 
-	for i in range(search.tracks.total):
-		track = search.tracks.results[i]
-		#print("Track title: ", track.title)
-		for j in range(len(track.artists)):
-			artist = track.artists
-			if artist[j]['name'] == artistName:
-				print("Right tracks")
-				print("Track title", track.title)
-				rightTrack = True
-				break
+        listOfTracks = search.tracks.results
+        for track in listOfTracks:
+            listOfArtists = track.artists
+            for artist in listOfArtists:
+                if artist.name == artistName:
+                    isRightTrack = True
+                    break
 
-		if rightTrack:
-			#print("Add to playlist track: ", track.title)
-			rightTrack = False
+            if isRightTrack:
+                counter = counter + 1
+                print("Add track: ", track.title)
+                client.users_playlists_insert_track(kind=doomerId, track_id=track.id, album_id=track.albums[0].id, revision=revision)
+                revision = revision + 1
+                isRightTrack = False
+    
 
-	'''for track in search.tracks.results:
-					for artist in track.artists:
-						print("title: ", track.title)
-						print("Artist: ", artist['name'])
-						if artist['name'] == artistName:
-							print("Right track")
-							rightTrack = True
-							break'''
+    print("Number of tracks: ", counter)
 
-		
-
-	'''
-	if searchResult.best == None:
-		print("No such artist")
-		return
-	
-	print("Number of artists", searchResult.tracks.total)
-	'''
 
 if __name__ == '__main__':
-	query = ''
-	while query != 'q':
-		query = str(input())
-		findTracksOfArtist(query)
+    while True:
+        query = input('Enter artist name: ')
+        if query == "!quit":
+            break;
+        addTracksByArtist(query)

@@ -10,6 +10,16 @@ password = credentialsFile.read(9)
 #client = Client()
 client = Client.from_credentials(email, password)
 
+def isTrackInPlaylist(playlistId, trackName):
+    playlist = client.users_playlists(playlistId)
+    listOfTracks = playlist.tracks
+
+    for shortTrack in listOfTracks:
+        if shortTrack.track.title == trackName:
+            print("Track is already in playlist")
+            return True
+
+    return False
 
 def addTracksByArtist(artistName):
 
@@ -47,8 +57,9 @@ def addTracksByArtist(artistName):
             if isRightTrack:
                 counter = counter + 1
                 print("Add track: ", track.title)
-                client.users_playlists_insert_track(kind=doomerId, track_id=track.id, album_id=track.albums[0].id, revision=revision)
-                revision = revision + 1
+                if not isTrackInPlaylist(doomerId, track.title):
+                    client.users_playlists_insert_track(kind=doomerId, track_id=track.id, album_id=track.albums[0].id, revision=revision)
+                    revision = revision + 1
                 isRightTrack = False
     
 
